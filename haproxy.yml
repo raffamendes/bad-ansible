@@ -1,0 +1,24 @@
+---
+- name: 'Install and start haproxy'
+  hosts: frontends
+  gather_facts: false
+  become: true
+  tasks:
+    - name: "Install needed packages"
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - httpie
+          - haproxy
+    - name: 'configure haproxy'
+      template:
+        src: ./haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+  notify: "restart haproxy"
+- handlers:
+  - name: "restart haproxy"
+    service:
+      name: haproxy
+      state: restarted
+
